@@ -21,7 +21,7 @@ let myChart;
 bouton.addEventListener("click", function (event) {
     event.preventDefault();
     const ville = inputVille.value;
-    const villeMaj = ville.charAt(0).toUpperCase() + ville.slice(1).toLowerCase(); 
+    const villeMaj = ville.charAt(0).toUpperCase() + ville.slice(1).toLowerCase().trim(); 
     fetchCoordinates(villeMaj);
 });
 
@@ -35,8 +35,11 @@ async function fetchCoordinates(ville) {
     const data = await response.json();
     console.log(data);
     if (data === undefined || data.length === 0) {
+        temperature.innerHTML = "-°C";
+        humidity.innerHTML = "Humidité : -%";
+        wind.innerHTML = "Vent : - km/h";
         city.innerHTML = "Ville introuvable !";
-        details.innerHTML = "Ville le nom de la ville";
+        details.innerHTML = "Verifier le nom de la ville";
         return;
     }
     latitude = data[0].lat;
