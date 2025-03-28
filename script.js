@@ -48,9 +48,8 @@ async function fetchWeather(latitude, longitude) {
     );
     const data = await response.json();
 
-
+     temperature.innerHTML = `${data.current.apparent_temperature} °C`;
+    details.innerHTML = `Temperature actuelle`;
     console.log(data);
-  
-   
     return data;
 }
