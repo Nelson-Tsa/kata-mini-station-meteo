@@ -21,7 +21,8 @@ let myChart;
 bouton.addEventListener("click", function (event) {
     event.preventDefault();
     const ville = inputVille.value;
-    fetchCoordinates(ville);
+    const villeMaj = ville.charAt(0).toUpperCase() + ville.slice(1).toLowerCase(); 
+    fetchCoordinates(villeMaj);
 });
 
 
