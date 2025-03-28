@@ -8,13 +8,14 @@ const humidity = document.querySelector("#humidity");
 const wind = document.querySelector("#wind");
 const meteoIcon = document.querySelector("#weatherIcon");
 const chart = document.querySelector("#myChart");
+const backgroundImage = document.querySelector("#backgroundImage");
 
 chart.style.display = "none";
 
 let latitude;
 let longitude;
 let codeMeteo;
-
+let myChart;
 
 
 bouton.addEventListener("click", function (event) {
@@ -128,6 +129,9 @@ async function meteoDernierjours(latitude, longitude) {
 const ctx = document.getElementById('myChart');
 
 function updateChart(data) {
+  if (myChart) {
+    myChart.destroy();
+  }
     chart.style.display = "block";
     const hier = data.hourly.time[12];
     const avanthier = data.hourly.time[36];
@@ -152,7 +156,7 @@ function updateChart(data) {
     let demainTemp = data.hourly.temperature_2m[84];
     let apresDemainTemp = data.hourly.temperature_2m[108];
 
-new Chart(ctx, {
+myChart = new Chart(ctx, {
   type: 'bar',
   data: {
     labels: [hierDate, avantHierDate, aujourdhuiDate, demainDate, apresDemainDate],
