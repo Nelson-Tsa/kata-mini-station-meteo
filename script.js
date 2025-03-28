@@ -4,11 +4,14 @@ const temperature = document.querySelector("#temperature");
 const city = document.querySelector("#city");
 const details = document.querySelector("#details");
 const gps = document.querySelector("#gps");
+const humidity = document.querySelector("#humidity");
+const wind = document.querySelector("#wind");
+const meteoIcon = document.querySelector("#weatherIcon");
 
 
 let latitude;
 let longitude;
-
+let codeMeteo;
 
 
 
@@ -28,7 +31,8 @@ async function fetchCoordinates(ville) {
     const data = await response.json();
     console.log(data);
     if (data === undefined || data.length === 0) {
-        alert("Ville introuvable !");
+        city.innerHTML = "Ville introuvable !";
+        details.innerHTML = "Ville le nom de la ville";
         return;
     }
     latitude = data[0].lat;
@@ -49,7 +53,56 @@ async function fetchWeather(latitude, longitude) {
     const data = await response.json();
 
      temperature.innerHTML = `${data.current.apparent_temperature} °C`;
+     humidity.innerHTML = `Humidité : ${data.current.relative_humidity_2m} %`;
+     wind.innerHTML = `Vent : ${data.current.wind_speed_10m} km/h`;
     details.innerHTML = `Temperature actuelle`;
+    codeMeteo = data.current.weather_code;
+    getWeatherIcon(codeMeteo);
+    console.log(codeMeteo);
     console.log(data);
     return data;
 }
+
+function getWeatherIcon(code) {
+    if(code = 0) {
+        meteoIcon.innerHTML = "☀️";
+    }
+    else if(code <= 2) {
+        meteoIcon.innerHTML = "🌤️";
+    }
+    else if(code  = 3) {
+        meteoIcon.innerHTML = "🌥️";
+    }
+    else if(code  <= 48) {
+        meteoIcon.innerHTML = "🌫️";
+    }
+    else if(code  <= 55) {
+        meteoIcon.innerHTML = "🌦️";
+    }
+    else if(code  <= 57) {
+        meteoIcon.innerHTML = "🌨️";
+    }
+    else if(code  <= 65) {
+        meteoIcon.innerHTML = "🌧️";
+    }
+    else if(code  <= 67) {
+        meteoIcon.innerHTML = "🌨️";
+    }
+    else if(code  = 77) {
+        meteoIcon.innerHTML = "❄️";
+    }
+    else if(code  <=82 ) {
+        meteoIcon.innerHTML = "🌧️";
+    }
+    else if(code <= 86) {
+        meteoIcon.innerHTML = "🌨️❄️";
+    }
+    else if(code = 95) {
+        meteoIcon.innerHTML = "🌩️";
+    }
+    else if(code <= 99) {
+        meteoIcon.innerHTML = "⛈️";
+    }
+    
+}
+
