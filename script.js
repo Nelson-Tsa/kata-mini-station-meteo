@@ -7,7 +7,9 @@ const gps = document.querySelector("#gps");
 const humidity = document.querySelector("#humidity");
 const wind = document.querySelector("#wind");
 const meteoIcon = document.querySelector("#weatherIcon");
+const chart = document.querySelector("#myChart");
 
+chart.style.display = "none";
 
 let latitude;
 let longitude;
@@ -42,6 +44,8 @@ async function fetchCoordinates(ville) {
     gps.innerHTML = `${latitude}, ${longitude}`;
     fetchWeather(latitude, longitude).then((data) => {
         console.log(data);
+        const isDay = data.current.is_day;
+        fetchCityImage(ville, isDay);
     });
     return latitude, longitude;
 }
@@ -68,13 +72,13 @@ async function fetchWeather(latitude, longitude) {
 }
 
 function getWeatherIcon(code) {
-    if(code = 0) {
+    if(code === 0) {
         meteoIcon.innerHTML = "☀️";
     }
     else if(code <= 2) {
         meteoIcon.innerHTML = "🌤️";
     }
-    else if(code  = 3) {
+    else if(code  === 3) {
         meteoIcon.innerHTML = "🌥️";
     }
     else if(code  <= 48) {
@@ -92,7 +96,7 @@ function getWeatherIcon(code) {
     else if(code  <= 67) {
         meteoIcon.innerHTML = "🌨️";
     }
-    else if(code  = 77) {
+    else if(code  === 77) {
         meteoIcon.innerHTML = "❄️";
     }
     else if(code  <=82 ) {
@@ -101,7 +105,7 @@ function getWeatherIcon(code) {
     else if(code <= 86) {
         meteoIcon.innerHTML = "🌨️❄️";
     }
-    else if(code = 95) {
+    else if(code === 95) {
         meteoIcon.innerHTML = "🌩️";
     }
     else if(code <= 99) {
@@ -124,6 +128,7 @@ async function meteoDernierjours(latitude, longitude) {
 const ctx = document.getElementById('myChart');
 
 function updateChart(data) {
+    chart.style.display = "block";
     const hier = data.hourly.time[12];
     const avanthier = data.hourly.time[36];
     const aujourdhui = data.hourly.time[60];
@@ -165,4 +170,17 @@ new Chart(ctx, {
     }
   }
 });
+
+}
+
+const apikey = "Drv7-pzrzSqOXqgrj2I2_9qyEp61XgAY82o79grl8PE";
+
+async function fetchCityImage(ville, isDay) {
+    const query = `${ville} ${isDay ? 'day' : 'night'}`;
+    const response = await fetch(
+        `https://api.unsplash.com/photos/random?query=${query}&client_id=${apikey}`
+    );
+    const data = await response.json();
+    const imageUrl = data.urls.regular;
+    backgroundImage.style.backgroundImage = `url(${imageUrl})`;
 }
