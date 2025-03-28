@@ -38,6 +38,7 @@ async function fetchCoordinates(ville) {
         temperature.innerHTML = "-°C";
         humidity.innerHTML = "Humidité : -%";
         wind.innerHTML = "Vent : - km/h";
+        gps.innerHTML = "";
         city.innerHTML = "Ville introuvable !";
         details.innerHTML = "Verifier le nom de la ville";
         return;
