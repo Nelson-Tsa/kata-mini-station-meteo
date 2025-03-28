@@ -60,6 +60,10 @@ async function fetchWeather(latitude, longitude) {
     getWeatherIcon(codeMeteo);
     console.log(codeMeteo);
     console.log(data);
+    meteoDernierjours(latitude, longitude).then((data) => {
+        // console.log(data + "la");
+        
+    });
     return data;
 }
 
@@ -106,3 +110,59 @@ function getWeatherIcon(code) {
     
 }
 
+
+async function meteoDernierjours(latitude, longitude) {
+    const response = await fetch(
+        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,precipitation&past_days=2`
+    )
+    const data = await response.json();
+    console.log(data);
+    updateChart(data);
+}
+
+
+const ctx = document.getElementById('myChart');
+
+function updateChart(data) {
+    const hier = data.hourly.time[12];
+    const avanthier = data.hourly.time[36];
+    const aujourdhui = data.hourly.time[60];
+    const demain = data.hourly.time[84];
+    const apresDemain = data.hourly.time[108];
+
+    let hierDate = hier.split("T")[0];
+    hierDate = hierDate.split("-").reverse().join("/");
+    let avantHierDate = avanthier.split("T")[0];
+    avantHierDate = avantHierDate.split("-").reverse().join("/");
+    let aujourdhuiDate = aujourdhui.split("T")[0];
+    aujourdhuiDate = aujourdhuiDate.split("-").reverse().join("/");
+    let demainDate = demain.split("T")[0];
+    demainDate = demainDate.split("-").reverse().join("/");
+    let apresDemainDate = apresDemain.split("T")[0];
+    apresDemainDate = apresDemainDate.split("-").reverse().join("/");
+
+    let hierTemp = data.hourly.temperature_2m[12];
+    let avantHierTemp = data.hourly.temperature_2m[36];
+    let aujourdhuiTemp = data.hourly.temperature_2m[60];
+    let demainTemp = data.hourly.temperature_2m[84];
+    let apresDemainTemp = data.hourly.temperature_2m[108];
+
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: [hierDate, avantHierDate, aujourdhuiDate, demainDate, apresDemainDate],
+    datasets: [{
+      label: 'Temperature',
+      data: [hierTemp, avantHierTemp, aujourdhuiTemp, demainTemp, apresDemainTemp],
+      borderWidth: 1
+    }]
+  },
+  options: {
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  }
+});
+}
