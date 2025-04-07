@@ -20,7 +20,11 @@ let myChart;
 
 bouton.addEventListener("click", function (event) {
     event.preventDefault();
-    const ville = inputVille.value;
+    const ville = inputVille.value.trim();
+    if(!ville){
+        city.innerHTML = "Veuillez entrer une ville";
+        return;
+    }
     const villeMaj = ville.charAt(0).toUpperCase() + ville.slice(1).toLowerCase().trim(); 
     fetchCoordinates(villeMaj);
 });
@@ -28,11 +32,13 @@ bouton.addEventListener("click", function (event) {
 
 
 async function fetchCoordinates(ville) {
+    try {
     const response = await fetch(
         `https://nominatim.openstreetmap.org/search?q=${ville}&format=json&addressdetails=1&limit=1&polygon_svg=1&extratags=1&namedetails=1&countrycodes=fr&accept-language=fr&bounded=1`
     );
    
     const data = await response.json();
+
     console.log(data);
     if (data === undefined || data.length === 0) {
         temperature.innerHTML = "-°C";
@@ -45,18 +51,22 @@ async function fetchCoordinates(ville) {
     }
     latitude = data[0].lat;
     longitude = data[0].lon;
-    console.log(latitude, longitude);
     city.innerHTML = ville;
     gps.innerHTML = `${latitude}, ${longitude}`;
-    fetchWeather(latitude, longitude).then((data) => {
-        console.log(data);
-        const isDay = data.current.is_day;
-        fetchCityImage(ville, isDay);
-    });
-    return latitude, longitude;
+
+    const weatherData = await fetchWeather(latitude, longitude);
+        const isDay = weatherData.current.is_day;
+        await fetchCityImage(ville, isDay);
+        
+        return; 
+    } catch (error) {
+        console.error("Erreur lors de la récupération des coordonnées:", error);
+        city.innerHTML = "Erreur lors de la recherche";
+    }
 }
 
 async function fetchWeather(latitude, longitude) {
+    try {
     const response = await fetch(
         `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=sunrise,daylight_duration,sunshine_duration,sunset,weather_code,apparent_temperature_max,apparent_temperature_min,uv_index_max,rain_sum,showers_sum,snowfall_sum,precipitation_sum,precipitation_hours,precipitation_probability_max,wind_direction_10m_dominant,wind_speed_10m_max&hourly=temperature_2m,relative_humidity_2m,rain,snowfall,wind_speed_10m,weather_code,visibility,uv_index&current=temperature_2m,relative_humidity_2m,is_day,precipitation,rain,showers,snowfall,weather_code,wind_speed_10m,wind_direction_10m,apparent_temperature&timezone=auto`
     );
@@ -68,13 +78,16 @@ async function fetchWeather(latitude, longitude) {
     details.innerHTML = `Temperature actuelle`;
     codeMeteo = data.current.weather_code;
     getWeatherIcon(codeMeteo);
+
     console.log(codeMeteo);
     console.log(data);
-    meteoDernierjours(latitude, longitude).then((data) => {
-        // console.log(data + "la");
-        
-    });
+    await meteoDernierjours(latitude, longitude);
     return data;
+    } catch (error) {
+        console.error("Erreur lors de la récupération de la météo:", error);
+        temperature.innerHTML = "Erreur de chargement";
+        return null;
+    }
 }
 
 function getWeatherIcon(code) {
@@ -185,6 +198,7 @@ myChart = new Chart(ctx, {
 const apikey = "Drv7-pzrzSqOXqgrj2I2_9qyEp61XgAY82o79grl8PE";
 
 async function fetchCityImage(ville, isDay) {
+    try{
     const query = `${ville} ${isDay ? 'day' : 'night'}`;
     const response = await fetch(
         `https://api.unsplash.com/photos/random?query=${query}&client_id=${apikey}`
@@ -192,4 +206,7 @@ async function fetchCityImage(ville, isDay) {
     const data = await response.json();
     const imageUrl = data.urls.regular;
     backgroundImage.style.backgroundImage = `url(${imageUrl})`;
+}catch (error) {
+    console.error("Erreur lors de la récupération de l'image de ville:", error);    
+}
 }
